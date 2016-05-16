@@ -6,15 +6,18 @@ Sven Co-op Angelscript documentation, tutorials and sample code
 This repository uses the following directory structure:
 
 root  
-|-documentation  
-||-plugins  
-||-maps  
-|-tutorials  
-||-plugins  
-||-maps  
-|-samples  
-||-plugins  
-||-maps  
++-documentation  
+|+-scripts  
+||+-plugins  
+||+-maps  
++-tutorials  
+|+-scripts  
+||+-plugins  
+||+-maps  
++-samples  
+|+-scripts  
+||+-plugins  
+||+-maps  
 
 Documentation contains code used to supplement API documentation.  
 Tutorials contains code used to supplement examples and tutorials on subjects not covered by the documentation.  
