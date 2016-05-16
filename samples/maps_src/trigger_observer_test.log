@@ -49,10 +49,11 @@ CreateBrush:
 CSGBrush:
  (0.01 seconds)
 
+added 1 additional animating textures.
 Including Wadfile: \program files (x86)\steam\steamapps\common\sven co-op\svencoop\zhlt.wad
  - Contains 0 used textures, 0.00 percent of map (19 textures in wad)
 Using Wadfile: \program files (x86)\steam\steamapps\common\sven co-op\svencoop\halflife.wad
- - Contains 4 used textures, 100.00 percent of map (3116 textures in wad)
+ - Contains 6 used textures, 100.00 percent of map (3116 textures in wad)
 
 Wad files required to run the map: "halflife.wad;"
 Texture usage is at 0.08 mb (of 64.00 mb MAX)
@@ -102,12 +103,12 @@ BSP generation successful, writing portal file 'C:\Program Files (x86)\Steam\ste
 SolidBSP [hull 1] 29 (0.00 seconds)
 SolidBSP [hull 2] 29 (0.00 seconds)
 SolidBSP [hull 3] 29 (0.00 seconds)
-Reduced 18 clipnodes to 18
-Reduced 5 texinfos to 5
-Reduced 4 texdatas to 4 (180 bytes to 180)
-Reduced 152 planes to 20
+Reduced 36 clipnodes to 36
+Reduced 8 texinfos to 8
+Reduced 6 texdatas to 6 (268 bytes to 268)
+Reduced 184 planes to 39
 FixBrinks:
-Increased 18 clipnodes to 18.
+Increased 36 clipnodes to 36.
 0.02 seconds elapsed
 
 -----   END   hlbsp -----
@@ -149,7 +150,7 @@ LeafThread:
  (0.00 seconds)
 average leafs visible: 1
 g_visdatasize:1  compressed from 1
-0.01 seconds elapsed
+0.00 seconds elapsed
 
 -----   END   hlvis -----
 
@@ -233,28 +234,28 @@ wall bleeding fix    [                on ] [                on ]
 
 Load Textures:
 Using Wadfile: C:\Program Files (x86)\Steam\steamapps\common\Sven Co-op\svencoop_addon\maps\trigger_observer_test.wa_
-4 textures referenced
+6 textures referenced
 Reading texlights from 'C:\PROGRA~2\Steam\STEAMA~1\common\SVENCO~2\mapping\COMPIL~1\lights.rad'
 0 opaque models
 0 opaque faces
-96 faces
-Create Patches : 1006 base patches
-21845 square feet [3145728.00 square inches]
+102 faces
+Create Patches : 1012 base patches
+21877 square feet [3150336.00 square inches]
 9 direct lights and 0 fast direct lights
 1 light styles
 
 FindFacePositions:
  (0.04 seconds)
 BuildFacelights:
- (0.07 seconds)
+ (0.08 seconds)
 BuildVisLeafs:
  (0.04 seconds)
-visibility matrix   :   0.2 megs
+visibility matrix   :   0.3 megs
 MakeScales:
- (0.03 seconds)
-Transfer Lists :      770976 :   770.98k transfers
-       Indices :        6400 :     6.25k bytes
-          Data :     1544970 :     1.47M bytes
+ (0.04 seconds)
+Transfer Lists :      775959 :   775.96k transfers
+       Indices :       13100 :    12.79k bytes
+          Data :     1554951 :     1.48M bytes
 Bounce 1 GatherLight:
  (0.01 seconds)
 Bounce 2 GatherLight:
@@ -274,10 +275,10 @@ Bounce 8 GatherLight:
 CreateTriangulations:
  (0.01 seconds)
 AddPatchLights:
- (0.15 seconds)
+ (0.16 seconds)
 FinalLightFace:
  (0.00 seconds)
-1.38 seconds elapsed
+1.43 seconds elapsed
 
 -----   END   hlrad -----
 

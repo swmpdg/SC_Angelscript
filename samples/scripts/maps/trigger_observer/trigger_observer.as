@@ -126,6 +126,8 @@ class CTriggerObserver : ScriptBaseEntity
 				pev.effects |= EF_NODRAW;
 				
 				SetTouch( TouchFunction( this.SquareTouch ) );
+				
+				g_EntityFuncs.SetOrigin( self, pev.origin );
 			}
 			else
 			{
