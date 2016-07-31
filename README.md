@@ -1,6 +1,8 @@
 # SC_Angelscript
 Sven Co-op Angelscript documentation, tutorials and sample code
 
+HTML documentation: http://samvanheer.github.io/SC_Angelscript/docs
+
 ## Directory structure
 
 This repository uses the following directory structure:
