@@ -81,12 +81,6 @@
 <tr><td>AdminLevel_t StringToAdminLevel(const string& in szString) const</td>
 <td>Converts a string containing one of AdminLevelToString's return values to an admin level.Returns ADMIN_NO if the string cannot be converted to a suitable constant</td>
 </tr>
-<tr><td>bool ReportBug(CBasePlayer@ pPlayer, const string& in szDescription, string& out szOutPath)</td>
-<td>Reports a bug and logs it into a file.</td>
-</tr>
-<tr><td>bool ReportBug(CBasePlayer@ pPlayer, const string& in szDescription)</td>
-<td>Reports a bug and logs it into a file.</td>
-</tr>
 <tr><td>void ApplyMapCfgToPlayer(CBasePlayer@ pPlayer, bool fReEquip = false)</td>
 <td>Applies the map configuration on the given player.<br/>Will stack if called multiple times, unless fReEquip is true, in which case the player is stripped of all weapons and ammo first.</td>
 </tr>
