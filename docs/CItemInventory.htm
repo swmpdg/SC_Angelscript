@@ -489,6 +489,9 @@
 <tr><td>float m_flMaximumHoldTime</td>
 <td>Limit to how long this item can be held for, forcibly dropped after (0 = no limit)</td>
 </tr>
+<tr><td>float m_flWearOutTime</td>
+<td>Perform a trigger prior to this item being forcibly dropped (0 = none)</td>
+</tr>
 <tr><td>bool m_fCanBeDropped</td>
 <td>Holder is allowed to drop this item by choice</td>
 </tr>
@@ -504,23 +507,74 @@
 <tr><td>bool m_fKeepOnRespawn</td>
 <td>Holder still has the item after respawning (only applies to players -- re-equip NPC's manually)</td>
 </tr>
-<tr><td>string_t m_szTriggerOnCollect</td>
-<td>On successful collection</td>
+<tr><td>string_t m_szTriggerOnCollectSelf</td>
+<td>On successful collection (for collector)</td>
 </tr>
-<tr><td>string_t m_szTriggerOnCantCollect</td>
-<td>On failed collection</td>
+<tr><td>string_t m_szTriggerOnCollectTeam</td>
+<td>On successful collection (for collector's team)</td>
 </tr>
-<tr><td>string_t m_szTriggerOnDrop</td>
-<td>On successful drop</td>
+<tr><td>string_t m_szTriggerOnCollectOther</td>
+<td>On successful collection (for everyone else)</td>
 </tr>
-<tr><td>string_t m_szTriggerOnCantDrop</td>
-<td>On failed drop</td>
+<tr><td>string_t m_szTriggerOnCantCollectSelf</td>
+<td>On failed collection (for collector)</td>
 </tr>
-<tr><td>string_t m_szTriggerOnUse</td>
-<td>On usage (by trigger)</td>
+<tr><td>string_t m_szTriggerOnCantCollectTeam</td>
+<td>On failed collection (for collector's team)</td>
 </tr>
-<tr><td>string_t m_szTriggerOnReturn</td>
-<td>On automatic return to original location</td>
+<tr><td>string_t m_szTriggerOnCantCollectOther</td>
+<td>On failed collection (for everyone else)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnDropSelf</td>
+<td>On successful drop (for collector)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnDropTeam</td>
+<td>On successful drop (for collector's team)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnDropOther</td>
+<td>On successful drop (for everyone else)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnCantDropSelf</td>
+<td>On failed drop (for collector)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnCantDropTeam</td>
+<td>On failed drop (for collector's team)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnCantDropOther</td>
+<td>On failed drop (for everyone else)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnUseSelf</td>
+<td>On use by trigger (for collector)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnUseTeam</td>
+<td>On use by trigger (for collector's team)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnUseOther</td>
+<td>On use by trigger (for everyone else)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnWearingOutSelf</td>
+<td>On wearing out (for collector)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnWearingOutTeam</td>
+<td>On wearing out (for collector's team)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnWearingOutOther</td>
+<td>On wearing out (for everyone else)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnReturnSelf</td>
+<td>On return (for collector)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnReturnTeam</td>
+<td>On return (for collector's team)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnReturnOther</td>
+<td>On return (for everyone else)</td>
+</tr>
+<tr><td>string_t m_szTriggerOnMaterialise</td>
+<td>On materialise after return</td>
+</tr>
+<tr><td>string_t m_szTriggerOnDestroy</td>
+<td>On destroy</td>
 </tr>
 <tr><td>bool m_fEffectsPermanent</td>
 <td>Holder keeps effects after dropping the item</td>

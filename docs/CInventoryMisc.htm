@@ -33,11 +33,8 @@
 <tr><td>bool HasAllInGroup(CBaseMonster@ pHolder, const string& in szGroup)</td>
 <td>Returns true if is holding all items of a group</td>
 </tr>
-<tr><td>void ClearAll(CBaseMonster@ pHolder)</td>
+<tr><td>void RemoveAllFromHolder(CBaseMonster@ pHolder, const bool fDrop = false, const bool fBlockingWeaponsOnly = false, const bool fKeepOnRespawn = false)</td>
 <td>Clears all held inventory</td>
-</tr>
-<tr><td>void PurgeOnRespawn(CBaseMonster@ pHolder)</td>
-<td>Clears all held inventory that should be dropped on respawning</td>
 </tr>
 </table>
 </div>
