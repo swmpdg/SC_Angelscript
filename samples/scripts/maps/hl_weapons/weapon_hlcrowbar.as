@@ -77,9 +77,16 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 	{
 		self.m_fInReload = false;// cancel any reload in progress.
 
+		//Does not use the local WeaponTimeBase() because m_flNextAttack is not a CBasePlayerWeapon member. - Solokiller
 		self.m_pPlayer.m_flNextAttack = g_WeaponFuncs.WeaponTimeBase() + 0.5; 
 
-		self.m_pPlayer.pev.viewmodel = 0;
+		//Used to assign 0, which was converted to "0". Needs to be "". - Solokiller
+		self.m_pPlayer.pev.viewmodel = string_t();
+	}
+	
+	float WeaponTimeBase()
+	{
+		return g_Engine.time;
 	}
 	
 	void PrimaryAttack()
@@ -87,7 +94,7 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 		if( !Swing( 1 ) )
 		{
 			SetThink( ThinkFunction( this.SwingAgain ) );
-			self.pev.nextthink = g_Engine.time + 0.1;
+			self.pev.nextthink = WeaponTimeBase() + 0.1;
 		}
 	}
 	
@@ -142,7 +149,7 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 				case 2:
 					self.SendWeaponAnim( CROWBAR_ATTACK3MISS ); break;
 				}
-				self.m_flNextPrimaryAttack = g_Engine.time + 0.5;
+				self.m_flNextPrimaryAttack = WeaponTimeBase() + 0.5;
 				// play wiff or swish sound
 				g_SoundSystem.EmitSoundDyn( self.m_pPlayer.edict(), CHAN_WEAPON, "weapons/cbar_miss1.wav", 1, ATTN_NORM, 0, 94 + Math.RandomLong( 0,0xF ) );
 
@@ -177,7 +184,7 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 			// AdamR: End
 
 			g_WeaponFuncs.ClearMultiDamage();
-			if ( self.m_flNextPrimaryAttack + 1 < g_Engine.time )
+			if ( self.m_flNextPrimaryAttack + 1 < WeaponTimeBase() )
 			{
 				// first swing does full damage
 				pEntity.TraceAttack( self.m_pPlayer.pev, flDamage, g_Engine.v_forward, tr, DMG_CLUB );  
@@ -197,7 +204,7 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 
 			if( pEntity !is null )
 			{
-				self.m_flNextPrimaryAttack = g_Engine.time + 0.30; //0.25
+				self.m_flNextPrimaryAttack = WeaponTimeBase() + 0.30; //0.25
 
 				if( pEntity.Classify() != CLASS_NONE && pEntity.Classify() != CLASS_MACHINE && pEntity.BloodColor() != DONT_BLEED )
 				{
@@ -234,7 +241,7 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 			{
 				float fvolbar = g_SoundSystem.PlayHitSound( tr, vecSrc, vecSrc + ( vecEnd - vecSrc ) * 2, BULLET_PLAYER_CROWBAR );
 				
-				self.m_flNextPrimaryAttack = g_Engine.time + 0.25; //0.25
+				self.m_flNextPrimaryAttack = WeaponTimeBase() + 0.25; //0.25
 				
 				// override the volume here, cause we don't play texture sounds in multiplayer, 
 				// and fvolbar is going to be 0 from the above call.
