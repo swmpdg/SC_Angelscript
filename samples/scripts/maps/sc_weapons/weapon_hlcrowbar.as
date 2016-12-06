@@ -1,5 +1,7 @@
-/* 
-* The original Half-Life version of the crowbar
+/**
+*	@file
+*
+*	The original Half-Life version of the crowbar, modified to include a variation of Sven Co-op's electric crowbar attack.
 */
 
 enum crowbar_e
@@ -15,10 +17,64 @@ enum crowbar_e
 	CROWBAR_ATTACK3HIT
 };
 
+/**
+*	Amount of battery power to take every time a player gets hit.
+*/
+const int ELECTRIC_CROWBAR_BATTERY_USAGE_PLAYER = 1;
+
+/**
+*	Amount of battery power to take every time something gets hit. Also the minimum amount of power needed to activate and use electric attacks.
+*/
+const int ELECTRIC_CROWBAR_BATTERY_USAGE = 3;
+
+enum CrowbarSound
+{
+	CBARSOUND_HIT1 = 0,
+	CBARSOUND_HIT2,
+	CBARSOUND_HITBOD1,
+	CBARSOUND_HITBOD2,
+	CBARSOUND_HITBOD3,
+	CBARSOUND_MISS1
+};
+
+/**
+*	Gets the sound for the given sound event and electric state.
+*/
+string GetCrowbarSound( const CrowbarSound sound, const bool bIsElectric )
+{
+	switch( sound )
+	{
+	case CBARSOUND_HIT1:		return bIsElectric ? "weapons/cbe/cbe_hit1.wav" : "weapons/cbar_hit1.wav";
+	case CBARSOUND_HIT2:		return bIsElectric ? "weapons/cbe/cbe_hit2.wav" : "weapons/cbar_hit2.wav";
+	case CBARSOUND_HITBOD1:		return bIsElectric ? "weapons/cbe/cbe_hitbod1.wav" : "weapons/cbar_hitbod1.wav";
+	case CBARSOUND_HITBOD2:		return bIsElectric ? "weapons/cbe/cbe_hitbod2.wav" : "weapons/cbar_hitbod2.wav";
+	case CBARSOUND_HITBOD3:		return bIsElectric ? "weapons/cbe/cbe_hitbod3.wav" : "weapons/cbar_hitbod3.wav";
+	case CBARSOUND_MISS1:
+		{
+			if( !bIsElectric )
+				return "weapons/cbar_miss1.wav";
+				
+			if( Math.RandomLong( 0, 1 ) != 0 )
+			{
+				return "weapons/cbe/cbe_miss1.wav";
+			}
+			else
+			{
+				return "weapons/cbe/cbe_miss2.wav";
+			}
+		}
+	}
+	
+	//TODO: default sound? - Solokiller
+	return "";
+}
+
 class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 {
 	int m_iSwing;
 	TraceResult m_trHit;
+	
+	bool m_bIsElectric = false;
 	
 	void Spawn()
 	{
@@ -70,6 +126,8 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 
 	bool Deploy()
 	{
+		SetElectricState( false, true );
+	
 		return self.DefaultDeploy( self.GetV_Model( "models/v_crowbar.mdl" ), self.GetP_Model( "models/p_crowbar.mdl" ), CROWBAR_DRAW, "crowbar" );
 	}
 
@@ -80,8 +138,9 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 		//Does not use the local WeaponTimeBase() because m_flNextAttack is not a CBasePlayerWeapon member. - Solokiller
 		self.m_pPlayer.m_flNextAttack = g_WeaponFuncs.WeaponTimeBase() + 0.5; 
 
-		//Used to assign 0, which was converted to "0". Needs to be "". - Solokiller
 		self.m_pPlayer.pev.viewmodel = string_t();
+		
+		SetElectricState( false, true );
 	}
 	
 	float WeaponTimeBase()
@@ -96,6 +155,64 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 			SetThink( ThinkFunction( this.SwingAgain ) );
 			self.pev.nextthink = WeaponTimeBase() + 0.1;
 		}
+	}
+	
+	void SecondaryAttack()
+	{
+		self.m_flNextSecondaryAttack = WeaponTimeBase() + 0.2;
+		ToggleElectric();
+	}
+	
+	void ToggleElectric()
+	{
+		SetElectricState( !m_bIsElectric );
+	}
+	
+	bool OwnerHasEnoughArmor() const
+	{
+		return self.m_pPlayer !is null && self.m_pPlayer.pev.armorvalue >= ELECTRIC_CROWBAR_BATTERY_USAGE;
+	}
+	
+	void UseArmor( const int iAmount )
+	{
+		self.m_pPlayer.pev.armorvalue -= iAmount;
+	}
+	
+	bool OwnerCanUseElectric() const
+	{
+		if( self.m_pPlayer is null )
+			return false;
+	
+		if( ( self.m_pPlayer.pev.flags & FL_INWATER ) != 0 || !OwnerHasEnoughArmor() )
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	void SetElectricState( const bool bState, const bool bForce = false )
+	{
+		const bool bCurrentState = m_bIsElectric;
+		
+		m_bIsElectric = bState;
+		
+		if( self.m_pPlayer is null )
+			return;
+			
+		if( !OwnerCanUseElectric() )
+		{
+			m_bIsElectric = false;
+		}
+		
+		if( !bForce && m_bIsElectric == bCurrentState )
+			return;
+			
+		const int iBit = ( bState ? 1 : 0 ) << 6;
+	
+		NetworkMessage msg( MSG_ALL, NetworkMessages::CbElec );
+			msg.WriteByte( iBit | self.m_pPlayer.entindex() );
+		msg.End();
 	}
 	
 	void Smack()
@@ -151,7 +268,7 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 				}
 				self.m_flNextPrimaryAttack = WeaponTimeBase() + 0.5;
 				// play wiff or swish sound
-				g_SoundSystem.EmitSoundDyn( self.m_pPlayer.edict(), CHAN_WEAPON, "weapons/cbar_miss1.wav", 1, ATTN_NORM, 0, 94 + Math.RandomLong( 0,0xF ) );
+				g_SoundSystem.EmitSoundDyn( self.m_pPlayer.edict(), CHAN_WEAPON, GetCrowbarSound( CBARSOUND_MISS1, m_bIsElectric ), 1, ATTN_NORM, 0, 94 + Math.RandomLong( 0,0xF ) );
 
 				// player "shoot" animation
 				self.m_pPlayer.SetAnimation( PLAYER_ATTACK1 ); 
@@ -182,6 +299,13 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 			if ( self.m_flCustomDmg > 0 )
 				flDamage = self.m_flCustomDmg;
 			// AdamR: End
+			
+			//Called here so external armor drainage is caught on time. - Solokiller
+			if( !OwnerHasEnoughArmor() )
+				SetElectricState( false );
+			
+			if( m_bIsElectric )
+				flDamage *= 2;
 
 			g_WeaponFuncs.ClearMultiDamage();
 			if ( self.m_flNextPrimaryAttack + 1 < WeaponTimeBase() )
@@ -192,7 +316,8 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 			else
 			{
 				// subsequent swings do 50% (Changed -Sniper) (Half)
-				pEntity.TraceAttack( self.m_pPlayer.pev, flDamage * 0.5, g_Engine.v_forward, tr, DMG_CLUB );  
+				const float flMultiplier = m_bIsElectric ? 1.0f : 0.5f;
+				pEntity.TraceAttack( self.m_pPlayer.pev, flDamage * flMultiplier, g_Engine.v_forward, tr, DMG_CLUB );  
 			}	
 			g_WeaponFuncs.ApplyMultiDamage( self.m_pPlayer.pev, self.m_pPlayer.pev );
 
@@ -218,13 +343,21 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 					switch( Math.RandomLong( 0, 2 ) )
 					{
 					case 0:
-						g_SoundSystem.EmitSound( self.m_pPlayer.edict(), CHAN_WEAPON, "weapons/cbar_hitbod1.wav", 1, ATTN_NORM ); break;
+						g_SoundSystem.EmitSound( self.m_pPlayer.edict(), CHAN_WEAPON, GetCrowbarSound( CBARSOUND_HITBOD1, m_bIsElectric ), 1, ATTN_NORM ); break;
 					case 1:
-						g_SoundSystem.EmitSound( self.m_pPlayer.edict(), CHAN_WEAPON, "weapons/cbar_hitbod2.wav", 1, ATTN_NORM ); break;
+						g_SoundSystem.EmitSound( self.m_pPlayer.edict(), CHAN_WEAPON, GetCrowbarSound( CBARSOUND_HITBOD2, m_bIsElectric ), 1, ATTN_NORM ); break;
 					case 2:
-						g_SoundSystem.EmitSound( self.m_pPlayer.edict(), CHAN_WEAPON, "weapons/cbar_hitbod3.wav", 1, ATTN_NORM ); break;
+						g_SoundSystem.EmitSound( self.m_pPlayer.edict(), CHAN_WEAPON, GetCrowbarSound( CBARSOUND_HITBOD3, m_bIsElectric ), 1, ATTN_NORM ); break;
 					}
 					self.m_pPlayer.m_iWeaponVolume = 128; 
+					
+					//Hitting players uses a different amount - Solokiller
+					if( m_bIsElectric )
+						UseArmor( pEntity.IsPlayer() ? ELECTRIC_CROWBAR_BATTERY_USAGE_PLAYER : ELECTRIC_CROWBAR_BATTERY_USAGE );
+					
+					if( !OwnerHasEnoughArmor() )
+						SetElectricState( false );
+					
 					if( !pEntity.IsAlive() )
 						return true;
 					else
@@ -252,10 +385,10 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 				switch( Math.RandomLong( 0, 1 ) )
 				{
 				case 0:
-					g_SoundSystem.EmitSoundDyn( self.m_pPlayer.edict(), CHAN_WEAPON, "weapons/cbar_hit1.wav", fvolbar, ATTN_NORM, 0, 98 + Math.RandomLong( 0, 3 ) ); 
+					g_SoundSystem.EmitSoundDyn( self.m_pPlayer.edict(), CHAN_WEAPON, GetCrowbarSound( CBARSOUND_HIT1, m_bIsElectric ), fvolbar, ATTN_NORM, 0, 98 + Math.RandomLong( 0, 3 ) ); 
 					break;
 				case 1:
-					g_SoundSystem.EmitSoundDyn( self.m_pPlayer.edict(), CHAN_WEAPON, "weapons/cbar_hit2.wav", fvolbar, ATTN_NORM, 0, 98 + Math.RandomLong( 0, 3 ) ); 
+					g_SoundSystem.EmitSoundDyn( self.m_pPlayer.edict(), CHAN_WEAPON, GetCrowbarSound( CBARSOUND_HIT2, m_bIsElectric ), fvolbar, ATTN_NORM, 0, 98 + Math.RandomLong( 0, 3 ) ); 
 					break;
 				}
 			}
@@ -268,6 +401,14 @@ class weapon_hlcrowbar : ScriptBasePlayerWeaponEntity
 			self.m_pPlayer.m_iWeaponVolume = int( flVol * 512 ); 
 		}
 		return fDidHit;
+	}
+	
+	void ItemPostFrame()
+	{
+		if( !OwnerCanUseElectric() )
+			SetElectricState( false, true );
+			
+		BaseClass.ItemPostFrame();
 	}
 }
 
